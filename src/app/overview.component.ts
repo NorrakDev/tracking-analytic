@@ -91,15 +91,19 @@ function fmtDate(iso: string): string {
 export class OverviewComponent {
   mock = MOCK;
 
-  // Blue for weekday, grey for weekend — single series with per-item color
   volumeOptions: EChartsOption = {
     tooltip: {
       trigger: 'axis',
       axisPointer: { type: 'shadow' },
       formatter: (params: any) => {
-        const d = DV[params[0].dataIndex];
-        const label = fmtDate(d.date) + (d.is_weekend ? ' (weekend)' : '');
-        return `${label}<br/>${params[0].marker} ${params[0].value.toLocaleString()} shipments`;
+        const list: any[] = Array.isArray(params) ? params : [params];
+        const bar = list.find((p: any) => p.value != null && p.seriesType === 'bar');
+        const avg = list.find((p: any) => p.seriesName === 'Rolling 7-day avg');
+        const date = list[0]?.axisValue ?? '';
+        let s = `<strong>${date}</strong><br/>`;
+        if (bar) s += `${bar.marker} ${bar.seriesName}: <strong>${bar.value.toLocaleString()}</strong><br/>`;
+        if (avg) s += `${avg.marker} 7-day avg: ${avg.value.toLocaleString()}`;
+        return s;
       },
     },
     legend: {
@@ -111,7 +115,7 @@ export class OverviewComponent {
     xAxis: {
       type: 'category',
       data: DV.map(d => fmtDate(d.date)),
-      axisLabel: { color: '#9ca3af', fontSize: 9, interval: 2, rotate: 0 },
+      axisLabel: { color: '#9ca3af', fontSize: 9, interval: 2 },
       axisLine: { lineStyle: { color: '#e5e7eb' } },
       axisTick: { show: false },
     },
@@ -124,19 +128,16 @@ export class OverviewComponent {
       {
         name: 'Weekday',
         type: 'bar',
-        data: DV.map(d => ({
-          value: d.count,
-          itemStyle: { color: d.is_weekend ? '#d1d5db' : '#3b82f6' },
-        })),
+        stack: 'vol',
+        data: DV.map(d => d.is_weekend ? null : d.count),
+        itemStyle: { color: '#3b82f6' },
         barCategoryGap: '30%',
-        legendHoverLink: false,
-        // Custom legend colour handled via explicit items below
       },
-      // Invisible series just for legend colours
       {
         name: 'Weekend',
         type: 'bar',
-        data: [],
+        stack: 'vol',
+        data: DV.map(d => d.is_weekend ? d.count : null),
         itemStyle: { color: '#d1d5db' },
       },
       {

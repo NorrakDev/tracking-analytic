@@ -59,7 +59,7 @@ const NAV_ICONS = [
 
         <!-- Header -->
         <header class="bg-white border-b border-gray-200 h-12 flex items-center justify-between px-6 shrink-0">
-          <span class="text-xl font-bold text-blue-500">សុីប២៤ 📊</span>
+          <span class="text-xl font-bold text-blue-500">📊</span>
           <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
