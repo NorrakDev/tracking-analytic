@@ -3,6 +3,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { MOCK } from './mock.data';
 import { dynBarWidth } from './chart.utils';
+import { STATUS_META } from './constants';
 
 const DV = MOCK.overview.daily_volume;
 
@@ -163,7 +164,7 @@ export class OverviewComponent {
     },
     yAxis: {
       type: 'category',
-      data: MOCK.overview.active_by_status.map(s => s.label),
+      data: MOCK.overview.active_by_status.map(s => STATUS_META[s.status]?.label ?? s.status),
       axisLabel: { color: '#4b5563', fontSize: 11 },
       axisLine: { show: false },
       axisTick: { show: false },
@@ -172,7 +173,10 @@ export class OverviewComponent {
       type: 'bar',
       data: MOCK.overview.active_by_status.map(s => ({
         value: s.count,
-        itemStyle: { color: s.color, borderRadius: [0, 3, 3, 0] },
+        itemStyle: {
+          color: STATUS_META[s.status]?.color ?? '#94a3b8',
+          borderRadius: [0, 3, 3, 0],
+        },
       })),
       barMaxWidth: dynBarWidth(MOCK.overview.active_by_status.length),
       label: {

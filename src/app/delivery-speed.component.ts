@@ -3,6 +3,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { MOCK } from './mock.data';
 import { dynBarWidth } from './chart.utils';
+import { BUCKET_LABELS, SPEED_CAT_META } from './constants';
 
 const DS = MOCK.delivery_speed;
 const CARRIERS_REV = [...DS.avg_transit_by_carrier].reverse();
@@ -69,7 +70,7 @@ export class DeliverySpeedComponent {
     grid: { top: 16, right: 16, bottom: 44, left: 56 },
     xAxis: {
       type: 'category',
-      data: DS.histogram.map(d => d.bucket_label),
+      data: DS.histogram.map(d => BUCKET_LABELS[d.bucket_key] ?? d.bucket_key),
       name: 'Days to Deliver',
       nameLocation: 'middle',
       nameGap: 28,
@@ -121,7 +122,7 @@ export class DeliverySpeedComponent {
     grid: { top: 8, right: 16, bottom: 30, left: 52 },
     xAxis: {
       type: 'category',
-      data: DS.speed_categories.map(c => c.label),
+      data: DS.speed_categories.map(c => SPEED_CAT_META[c.key]?.label ?? c.key),
       axisLabel: { color: '#9ca3af', fontSize: 11 },
       axisLine: { lineStyle: { color: '#e5e7eb' } },
       axisTick: { show: false },
@@ -133,7 +134,7 @@ export class DeliverySpeedComponent {
     },
     series: [{
       type: 'bar',
-      data: DS.speed_categories.map(c => ({ value: c.count, itemStyle: { color: c.color } })),
+      data: DS.speed_categories.map(c => ({ value: c.count, itemStyle: { color: SPEED_CAT_META[c.key]?.color ?? '#94a3b8' } })),
       barWidth: '45%',
     }],
   };

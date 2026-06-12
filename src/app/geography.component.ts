@@ -3,6 +3,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { MOCK } from './mock.data';
 import { dynBarWidth } from './chart.utils';
+import { COUNTRY_NAMES, countryLabel, routeLabel } from './constants';
 
 function rateColor(v: number): string {
   if (v >= 85) return '#22c55e';
@@ -62,8 +63,8 @@ const AVG  = MOCK.geography.avg_delivery_time_by_destination;
           [value]="selectedDest()"
           (change)="selectedDest.set(castEvt($event))"
         >
-          @for (k of mock.geography.destination_keys; track k) {
-            <option [value]="k">{{ k }} ({{ mock.geography.carrier_performance_by_destination[k]?.country_name }})</option>
+          @for (k of destKeys; track k) {
+            <option [value]="k">{{ countryLabel(k) }}</option>
           }
         </select>
       </div>
@@ -99,9 +100,9 @@ const AVG  = MOCK.geography.avg_delivery_time_by_destination;
           </tr>
         </thead>
         <tbody>
-          @for (r of mock.geography.top_routes; track r.route_label) {
+          @for (r of mock.geography.top_routes; track r.origin_code + r.destination_code) {
             <tr class="border-b border-gray-50 hover:bg-gray-50/60 transition-colors">
-              <td class="px-5 py-3 font-medium text-gray-900">{{ r.route_label }}</td>
+              <td class="px-5 py-3 font-medium text-gray-900">{{ mkRoute(r.origin_code, r.destination_code) }}</td>
               <td class="px-5 py-3 text-gray-600">{{ r.shipments.toLocaleString() }}</td>
               <td class="px-5 py-3 text-gray-600">{{ r.delivery_rate_pct }}%</td>
               <td class="px-5 py-3 text-gray-600">{{ r.exception_rate_pct }}%</td>
@@ -117,21 +118,26 @@ export class GeographyComponent {
   mock = MOCK;
   selectedDest = signal('ES');
 
+  // Keys derived from API response — no hardcoded list needed
+  readonly destKeys = Object.keys(MOCK.geography.carrier_performance_by_destination);
+
   private destEntry = computed(() =>
     MOCK.geography.carrier_performance_by_destination[this.selectedDest()]
   );
 
-  destName = computed(() => this.destEntry()?.country_name ?? this.selectedDest());
+  destName = computed(() => COUNTRY_NAMES[this.selectedDest()] ?? this.selectedDest());
 
   private carriers = computed(() => this.destEntry()?.carriers ?? []);
 
   castEvt(e: Event) { return (e.target as HTMLSelectElement).value; }
+  countryLabel = countryLabel;
+  mkRoute = routeLabel;
 
   sendingOptions: EChartsOption = {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}<br/>shipments : ${p[0].value.toLocaleString()}` },
     grid: { top: 8, right: 60, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 10 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: SEND.map(d => `${d.country_name} (${d.country_code})`), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: SEND.map(d => countryLabel(d.country_code)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{ type: 'bar', data: SEND.map(d => ({ value: d.shipments, itemStyle: { color: '#3b82f6', borderRadius: [0, 3, 3, 0] } })), barMaxWidth: dynBarWidth(SEND.length), label: { show: true, position: 'right', formatter: (p: any) => p.value.toLocaleString(), color: '#6b7280', fontSize: 10 } }],
   };
 
@@ -139,7 +145,7 @@ export class GeographyComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}<br/>shipments : ${p[0].value.toLocaleString()}` },
     grid: { top: 8, right: 60, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 10 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: RECV.map(d => `${d.country_name} (${d.country_code})`), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: RECV.map(d => countryLabel(d.country_code)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{ type: 'bar', data: RECV.map(d => ({ value: d.shipments, itemStyle: { color: '#8b5cf6', borderRadius: [0, 3, 3, 0] } })), barMaxWidth: dynBarWidth(RECV.length), label: { show: true, position: 'right', formatter: (p: any) => p.value.toLocaleString(), color: '#6b7280', fontSize: 10 } }],
   };
 
@@ -147,7 +153,7 @@ export class GeographyComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}d` },
     grid: { top: 8, right: 48, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 10 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: AVG.map(d => `${d.country_name} (${d.country_code})`), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: AVG.map(d => countryLabel(d.country_code)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{ type: 'bar', data: AVG.map(d => ({ value: d.avg_transit_days, itemStyle: { color: transitColor(d.avg_transit_days), borderRadius: [0, 3, 3, 0] } })), barMaxWidth: dynBarWidth(AVG.length), label: { show: true, position: 'right', formatter: (p: any) => `${p.value}d`, color: '#6b7280', fontSize: 11 } }],
   };
 

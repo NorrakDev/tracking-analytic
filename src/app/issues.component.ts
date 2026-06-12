@@ -42,13 +42,13 @@ function fmtDate(iso: string): string {
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Carrier with Fewest Issues</p>
-        <p class="text-2xl font-bold text-green-600">{{ mock.issues.kpis.carrier_fewest.carrier }}</p>
-        <p class="text-xs text-gray-400 mt-1">{{ mock.issues.kpis.carrier_fewest.exception_rate_pct }}% issue rate</p>
+        <p class="text-2xl font-bold text-green-600">{{ mock.issues.kpis.carrier_fewest_issues.carrier }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ mock.issues.kpis.carrier_fewest_issues.exception_rate_pct }}% issue rate</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Carrier with Most Issues</p>
-        <p class="text-2xl font-bold text-red-500">{{ mock.issues.kpis.carrier_most.carrier }}</p>
-        <p class="text-xs text-gray-400 mt-1">{{ mock.issues.kpis.carrier_most.exception_rate_pct }}% issue rate</p>
+        <p class="text-2xl font-bold text-red-500">{{ mock.issues.kpis.carrier_most_issues.carrier }}</p>
+        <p class="text-xs text-gray-400 mt-1">{{ mock.issues.kpis.carrier_most_issues.exception_rate_pct }}% issue rate</p>
       </div>
     </div>
 
