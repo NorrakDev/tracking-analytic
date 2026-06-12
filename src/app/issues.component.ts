@@ -3,6 +3,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { MOCK } from './mock.data';
 import { dynBarWidth } from './chart.utils';
+import { carrierName } from './constants';
 
 const ISS = MOCK.issues;
 const BY_CARRIER_ASC = [...ISS.exception_rate_by_carrier].reverse();
@@ -42,12 +43,12 @@ function fmtDate(iso: string): string {
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Carrier with Fewest Issues</p>
-        <p class="text-2xl font-bold text-green-600">{{ mock.issues.kpis.carrier_fewest_issues.carrier }}</p>
+        <p class="text-2xl font-bold text-green-600">{{ cn(mock.issues.kpis.carrier_fewest_issues.carrier) }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ mock.issues.kpis.carrier_fewest_issues.exception_rate_pct }}% issue rate</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Carrier with Most Issues</p>
-        <p class="text-2xl font-bold text-red-500">{{ mock.issues.kpis.carrier_most_issues.carrier }}</p>
+        <p class="text-2xl font-bold text-red-500">{{ cn(mock.issues.kpis.carrier_most_issues.carrier) }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ mock.issues.kpis.carrier_most_issues.exception_rate_pct }}% issue rate</p>
       </div>
     </div>
@@ -67,6 +68,7 @@ function fmtDate(iso: string): string {
 })
 export class IssuesComponent {
   mock = MOCK;
+  cn = carrierName;
 
   rateOverTimeOptions: EChartsOption = {
     tooltip: { trigger: 'axis', formatter: (p: any) => `${p[0].name}: ${p[0].value}%` },
@@ -107,7 +109,7 @@ export class IssuesComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}%` },
     grid: { top: 8, right: 56, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', max: 45, axisLabel: { color: '#9ca3af', fontSize: 10 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: BY_CARRIER_ASC.map(c => c.carrier), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: BY_CARRIER_ASC.map(c => carrierName(c.carrier)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{
       type: 'bar', barMaxWidth: dynBarWidth(BY_CARRIER_ASC.length),
       data: BY_CARRIER_ASC.map(c => ({ value: c.exception_rate_pct, itemStyle: { color: issueColor(c.exception_rate_pct), borderRadius: [0, 3, 3, 0] } })),

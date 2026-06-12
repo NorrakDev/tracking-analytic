@@ -3,6 +3,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { MOCK } from './mock.data';
 import { dynBarWidth } from './chart.utils';
+import { carrierName } from './constants';
 
 function rateColor(v: number): string {
   if (v >= 90) return '#22c55e';
@@ -39,22 +40,22 @@ const BY_EDD  = SC.filter(c => c.edd_on_time_pct != null)
     <div class="grid grid-cols-4 gap-4 mb-6">
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Most Used</p>
-        <p class="text-2xl font-bold text-gray-900">{{ mock.carriers.kpis.most_used.carrier }}</p>
+        <p class="text-2xl font-bold text-gray-900">{{ cn(mock.carriers.kpis.most_used.carrier) }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ mock.carriers.kpis.most_used.shipments.toLocaleString() }} shipments</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Best Delivery Rate</p>
-        <p class="text-2xl font-bold text-green-600">{{ mock.carriers.kpis.best_delivery_rate.carrier }}</p>
+        <p class="text-2xl font-bold text-green-600">{{ cn(mock.carriers.kpis.best_delivery_rate.carrier) }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ mock.carriers.kpis.best_delivery_rate.rate_pct }}%</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Fastest</p>
-        <p class="text-2xl font-bold text-green-600">{{ mock.carriers.kpis.fastest.carrier }}</p>
+        <p class="text-2xl font-bold text-green-600">{{ cn(mock.carriers.kpis.fastest.carrier) }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ mock.carriers.kpis.fastest.avg_transit_days }} days avg.</p>
       </div>
       <div class="bg-white rounded-lg border border-gray-200 p-4">
         <p class="text-xs text-gray-500 mb-1.5">Top Rated</p>
-        <p class="text-2xl font-bold text-green-600">{{ mock.carriers.kpis.top_rated.carrier }}</p>
+        <p class="text-2xl font-bold text-green-600">{{ cn(mock.carriers.kpis.top_rated.carrier) }}</p>
         <p class="text-xs text-gray-400 mt-1">{{ mock.carriers.kpis.top_rated.stars_str }}&nbsp;&nbsp;{{ mock.carriers.kpis.top_rated.stars_raw }} / 5</p>
       </div>
     </div>
@@ -136,7 +137,7 @@ const BY_EDD  = SC.filter(c => c.edd_on_time_pct != null)
           <tbody>
             @for (c of tableRows(); track c.carrier) {
               <tr class="border-b border-gray-50 hover:bg-gray-50/60 transition-colors">
-                <td class="px-4 py-3 font-medium text-gray-900">{{ c.carrier }}</td>
+                <td class="px-4 py-3 font-medium text-gray-900">{{ cn(c.carrier) }}</td>
                 <td class="px-4 py-3 text-right text-gray-600">{{ c.shipments.toLocaleString() }}</td>
                 <td class="px-4 py-3 text-right">
                   <span [class]="rateBadge(c.delivery_rate_pct)">{{ c.delivery_rate_pct }}%</span>
@@ -172,6 +173,7 @@ const BY_EDD  = SC.filter(c => c.edd_on_time_pct != null)
 })
 export class CarriersComponent {
   mock = MOCK;
+  cn = carrierName;
 
   // ── Table state ──────────────────────────────────────────────────
   searchQuery = signal('');
@@ -184,7 +186,7 @@ export class CarriersComponent {
     const dir = this.sortDir();
 
     const rows = q
-      ? SC.filter(c => c.carrier.toLowerCase().includes(q))
+      ? SC.filter(c => carrierName(c.carrier).toLowerCase().includes(q))
       : [...SC];
 
     return rows.sort((a, b) => {
@@ -248,7 +250,7 @@ export class CarriersComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}` },
     grid: { top: 8, right: 48, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', max: 5, axisLabel: { color: '#9ca3af', fontSize: 10 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: BY_STAR.map(c => c.carrier), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: BY_STAR.map(c => carrierName(c.carrier)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{
       type: 'bar', barMaxWidth: dynBarWidth(BY_STAR.length),
       data: BY_STAR.map(c => ({ value: c.stars_raw, itemStyle: { color: starColor(c.stars_raw), borderRadius: [0, 3, 3, 0] } })),
@@ -260,7 +262,7 @@ export class CarriersComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}%` },
     grid: { top: 8, right: 56, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', max: 100, axisLabel: { color: '#9ca3af', fontSize: 10, formatter: '{value}' }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: BY_RATE.map(c => c.carrier), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: BY_RATE.map(c => carrierName(c.carrier)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{
       type: 'bar', barMaxWidth: dynBarWidth(BY_RATE.length),
       data: BY_RATE.map(c => ({ value: c.delivery_rate_pct, itemStyle: { color: rateColor(c.delivery_rate_pct), borderRadius: [0, 3, 3, 0] } })),
@@ -272,7 +274,7 @@ export class CarriersComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}d` },
     grid: { top: 8, right: 48, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 10 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: BY_DAYS.map(c => c.carrier), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: BY_DAYS.map(c => carrierName(c.carrier)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{
       type: 'bar', barMaxWidth: dynBarWidth(BY_DAYS.length),
       data: BY_DAYS.map(c => ({
@@ -287,7 +289,7 @@ export class CarriersComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}%` },
     grid: { top: 8, right: 56, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', max: 100, axisLabel: { color: '#9ca3af', fontSize: 10, formatter: '{value}' }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: BY_EDD.map(c => c.carrier), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: BY_EDD.map(c => carrierName(c.carrier)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{
       type: 'bar', barMaxWidth: dynBarWidth(BY_EDD.length),
       data: BY_EDD.map(c => ({

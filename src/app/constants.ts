@@ -1,3 +1,26 @@
+/** Carrier slug → display name */
+export const CARRIER_NAMES: Record<string, string> = {
+  'nacex':                 'Nacex',
+  'dhl':                   'DHL',
+  'dpd-poland':            'DPD Poland',
+  'portugal-post':         'Portugal Post',
+  'acs-courier':           'ACS Courier',
+  'inpost-poland':         'InPost Poland',
+  'packeta':               'Packeta',
+  'dpd':                   'DPD',
+  'fan-courier':           'FAN Courier',
+  'econt':                 'Econt',
+  'brt-italy':             'BRT Italy',
+  'slovak-parcel-service': 'Slovak Parcel Service',
+  'ups':                   'UPS',
+  'hermes-uk':             'Hermes UK',
+  'elta-courier-greece':   'ELTA Courier Greece',
+};
+
+export function carrierName(code: string): string {
+  return CARRIER_NAMES[code] ?? code;
+}
+
 /** ISO 3166-1 alpha-2 → display name */
 export const COUNTRY_NAMES: Record<string, string> = {
   ES: 'Spain',          DE: 'Germany',        PT: 'Portugal',

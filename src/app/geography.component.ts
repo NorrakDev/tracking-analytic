@@ -3,7 +3,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { MOCK } from './mock.data';
 import { dynBarWidth } from './chart.utils';
-import { COUNTRY_NAMES, countryLabel, routeLabel } from './constants';
+import { COUNTRY_NAMES, countryLabel, routeLabel, carrierName } from './constants';
 
 function rateColor(v: number): string {
   if (v >= 85) return '#22c55e';
@@ -132,6 +132,7 @@ export class GeographyComponent {
   castEvt(e: Event) { return (e.target as HTMLSelectElement).value; }
   countryLabel = countryLabel;
   mkRoute = routeLabel;
+  cn = carrierName;
 
   sendingOptions: EChartsOption = {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}<br/>shipments : ${p[0].value.toLocaleString()}` },
@@ -162,7 +163,7 @@ export class GeographyComponent {
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
       grid: { top: 4, right: 50, bottom: 4, left: 4, containLabel: true },
       xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 9 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-      yAxis: { type: 'category', data: data.map((r: any) => r.carrier), axisLabel: { color: '#4b5563', fontSize: 10 }, axisLine: { show: false }, axisTick: { show: false } },
+      yAxis: { type: 'category', data: data.map((r: any) => carrierName(r.carrier)), axisLabel: { color: '#4b5563', fontSize: 10 }, axisLine: { show: false }, axisTick: { show: false } },
       series: [{ type: 'bar', barMaxWidth: dynBarWidth(data.length), data: data.map((r: any) => ({ value: r[valueKey], itemStyle: { color: colorFn(r[valueKey]), borderRadius: [0, 3, 3, 0] } })), label: { show: true, position: 'right', formatter: (p: any) => fmt(p.value), color: '#6b7280', fontSize: 10 } }],
     };
   }

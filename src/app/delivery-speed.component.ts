@@ -3,7 +3,7 @@ import { NgxEchartsDirective } from 'ngx-echarts';
 import type { EChartsOption } from 'echarts';
 import { MOCK } from './mock.data';
 import { dynBarWidth } from './chart.utils';
-import { BUCKET_LABELS, SPEED_CAT_META } from './constants';
+import { BUCKET_LABELS, SPEED_CAT_META, carrierName } from './constants';
 
 const DS = MOCK.delivery_speed;
 const CARRIERS_REV = [...DS.avg_transit_by_carrier].reverse();
@@ -109,7 +109,7 @@ export class DeliverySpeedComponent {
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, formatter: (p: any) => `${p[0].name}: ${p[0].value}d` },
     grid: { top: 8, right: 48, bottom: 8, left: 8, containLabel: true },
     xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 10 }, splitLine: { lineStyle: { color: '#f3f4f6' } } },
-    yAxis: { type: 'category', data: CARRIERS_REV.map(c => c.carrier), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
+    yAxis: { type: 'category', data: CARRIERS_REV.map(c => carrierName(c.carrier)), axisLabel: { color: '#4b5563', fontSize: 11 }, axisLine: { show: false }, axisTick: { show: false } },
     series: [{
       type: 'bar', barMaxWidth: dynBarWidth(CARRIERS_REV.length),
       data: CARRIERS_REV.map(c => ({ value: c.avg_transit_days, itemStyle: { color: transitColor(c.avg_transit_days), borderRadius: [0, 3, 3, 0] } })),
